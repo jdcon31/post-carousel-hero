@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post Carousel Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Colors. Change these to match your brand. */
+:root{
+  --paper:#EEF0EC; --ink:#17231C; --ink-2:#4A574F;
+  --btn:#17231C; --btn-ink:#F4F6F2; --focus:#2F6BFF;
+  --glow:#6CCB98; --sun:#F2C14E;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#121813; --ink:#E6EBE5; --ink-2:#9AA79D; --btn:#E6EBE5; --btn-ink:#121813; }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:'Familjen Grotesk',system-ui,sans-serif;
+  font-size:18px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+
+/* Background: a soft colored light, fixed behind the page, plus fine grain. */
+.glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(55% 65% at 74% 48%,color-mix(in srgb,var(--glow) 55%,transparent),transparent 70%),
+    radial-gradient(35% 40% at 84% 26%,color-mix(in srgb,var(--sun) 32%,transparent),transparent 70%)}
+.glow::after{content:"";position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* The first screen: words on the left, the stack of slides on the right. */
+.first{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;overflow-x:clip}
+header{display:flex;align-items:center;height:76px;font-weight:700;font-size:22px;letter-spacing:-.02em}
+.open{flex:1;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center;padding:8px 0 40px}
+h1{font-size:clamp(46px,6.2vw,84px);line-height:.98;letter-spacing:-.035em;font-weight:700;max-width:11ch}
+.lede{font-size:20px;color:var(--ink-2);margin:24px 0 32px;max-width:34ch}
+.cta{display:inline-flex;align-items:center;height:54px;padding:0 24px;border-radius:12px;background:var(--btn);color:var(--btn-ink);
+  font-size:17px;font-weight:600;text-decoration:none}
+.cta:hover{opacity:.9}
+
+/* The stack. Each image is one slide (4:5, like an Instagram post). */
+.fan{position:relative;height:min(74vh,640px);display:grid;place-items:center}
+.fan img{position:absolute;width:min(56%,330px);height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:16px;
+  box-shadow:0 24px 50px -24px rgba(0,0,0,.55);transition:transform .9s cubic-bezier(.4,0,.2,1),opacity .9s}
+
+@media (max-width:900px){
+  .wrap{padding:0 16px}
+  .open{grid-template-columns:minmax(0,1fr);gap:28px;padding:8px 0 24px}
+  .fan{height:330px}.fan img{width:min(52%,210px)}
+}
+@media (prefers-reduced-motion:reduce){.fan img{transition:none}}
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="first"><div class="wrap" style="display:flex;flex-direction:column;flex:1">
+  <header>Your Brand</header>
+  <div class="open">
+    <div>
+      <h1>Your headline goes here.</h1>
+      <p class="lede">One or two sentences about what you do and who it's for.</p>
+      <a class="cta" href="#">Get started</a>
+    </div>
+    <!-- Add, remove or reorder slides here. Any number works. -->
+    <div class="fan" id="fan" aria-hidden="true">
+      <img src="slides/01.jpg" alt="" width="720" height="900">
+      <img src="slides/02.jpg" alt="" width="720" height="900">
+      <img src="slides/03.jpg" alt="" width="720" height="900">
+      <img src="slides/04.jpg" alt="" width="720" height="900">
+      <img src="slides/05.jpg" alt="" width="720" height="900">
+      <img src="slides/06.jpg" alt="" width="720" height="900">
+      <img src="slides/07.jpg" alt="" width="720" height="900">
+      <img src="slides/08.jpg" alt="" width="720" height="900">
+    </div>
+  </div>
+</div></div>
+<script>
+// The front slide flicks away every few seconds and the next comes forward.
+// Stays still for people who turn off motion in their system settings.
+(function () {
+  var fan = document.getElementById("fan"); if (!fan) return;
+  var imgs = [].slice.call(fan.querySelectorAll("img")), n = imgs.length, top = 0;
+  var EVERY = 3200;                 // ms between flicks
+  // Where the front four sit: rotation (deg), x and y offset (% of the slide), opacity, stacking.
+  var POS = [{r: 0, x: 0, y: 0, o: 1, z: 5}, {r: 7, x: 16, y: 4, o: 1, z: 4},
+             {r: -7, x: -16, y: 6, o: 1, z: 3}, {r: 13, x: 30, y: 12, o: .9, z: 2}];
+  function paint() {
+    imgs.forEach(function (im, i) {
+      var d = (i - top + n) % n, p = POS[d] || {r: 0, x: 0, y: 20, o: 0, z: 0};
+      im.style.transform = "translate(" + p.x + "%," + p.y + "%) rotate(" + p.r + "deg)";
+      im.style.opacity = p.o; im.style.zIndex = p.z;
+    });
+  }
+  paint();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || n < 2) return;
+  setInterval(function () {
+    if (document.hidden) return;
+    var front = imgs[top];
+    front.style.transform = "translate(-120%,-6%) rotate(-16deg)"; front.style.opacity = 0;
+    setTimeout(function () { top = (top + 1) % n; paint(); }, 450);
+  }, EVERY);
+})();
+</script>
+</body>
+</html>
